@@ -13,7 +13,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       font-family: 'Georgia', serif;
     }
 
@@ -22,7 +22,6 @@
       width: 260px;
       height: 180px;
       cursor: pointer;
-      transition: 0.5s;
     }
 
     .envelope {
@@ -74,31 +73,36 @@
       left: 50%;
       transform: translateX(-50%) translateY(220px);
       width: 95%;
-      max-width: 700px;
+      max-width: 750px;
+      min-height: 300px;
       background: url('https://www.transparenttextures.com/patterns/paper-fibers.png') repeat;
       background-color: #fff9f2;
-      border-radius: 12px;
-      padding: 40px 50px;
+      border-radius: 14px;
+      padding: 36px 48px;
       box-sizing: border-box;
       box-shadow: 0 8px 16px rgba(0,0,0,0.25);
       opacity: 0;
       transition: 1.2s ease;
       z-index: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     .letter p {
-      margin: 0 0 16px;
+      margin: 0 0 18px;
       font-size: 18px;
-      line-height: 1.9;
+      line-height: 1.8;
       text-align: left;
       color: #2b2b2b;
       letter-spacing: 0.3px;
     }
 
     .emoji {
-      font-size: 28px;
+      font-size: 30px;
       text-align: center;
-      margin: 20px 0;
+      margin: 16px 0;
     }
 
     .photo-frame {
@@ -120,7 +124,7 @@
     }
 
     .next-button {
-      margin: 30px auto 0;
+      margin: 26px auto 0;
       padding: 12px 28px;
       background: #f5a6be;
       color: #fff;
@@ -133,7 +137,7 @@
       transition: 0.3s;
       opacity: 0;
       transform: translateY(20px);
-      max-width: 200px;
+      max-width: 220px;
     }
 
     .next-button:hover {
@@ -156,7 +160,7 @@
     }
 
     .envelope.open ~ .letter {
-      transform: translateX(-50%) translateY(-30px);
+      transform: translateX(-50%) translateY(-20px);
       opacity: 1;
     }
 
@@ -168,12 +172,13 @@
 
     @media (max-width: 480px) {
       .letter {
-        padding: 24px 18px;
+        padding: 22px 18px;
+        min-height: auto;
       }
 
       .letter p {
         font-size: 16px;
-        line-height: 1.8;
+        line-height: 1.75;
       }
 
       .photo-frame img {
@@ -208,15 +213,12 @@
 
 <script>
   function openEnvelope() {
-    const envelope = document.querySelector('.envelope');
-    const heart = document.querySelector('.heart');
-    envelope.classList.add('open');
-    heart.classList.add('open');
+    document.querySelector('.envelope').classList.add('open');
+    document.querySelector('.heart').classList.add('open');
   }
 
   window.addEventListener('click', () => {
-    const audio = document.getElementById('bgm');
-    audio.play();
+    document.getElementById('bgm').play();
   });
 </script>
 
