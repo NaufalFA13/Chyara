@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Selamat Pagi Cii 🌸</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ffe6f0, #ffd1ec);
+      font-family: 'Quicksand', sans-serif;
+      overflow: hidden;
+    }
+
+    #butterflyCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      color: #444;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Bunga Lily hidup (berayun + nafas) */
+    img.lily {
+      width: 170px;
+      height: auto;
+      animation: popUp 1.5s ease forwards, ayunNafas 4s ease-in-out infinite;
+      opacity: 0;
+      margin-top: 30px;
+      transform-origin: center bottom;
+    }
+
+    @keyframes popUp {
+      0% { transform: scale(0.5) rotate(0); opacity: 0; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    @keyframes ayunNafas {
+      0%   { transform: scale(1) rotate(0deg); }
+      25%  { transform: scale(1.02) rotate(2deg); }
+      50%  { transform: scale(1) rotate(0deg); }
+      75%  { transform: scale(1.02) rotate(-2deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    h1, p {
+      margin: 20px 0;
+      opacity: 0;
+    }
+
+    h1 {
+      font-size: 34px;
+      color: #ff4d6d;
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 1.5s;
+      letter-spacing: 1px;
+    }
+
+    p {
+      font-size: 18px;
+      color: #5a5a5a;
+      padding: 0 10px;
+      line-height: 1.6;
+    }
+
+    .text1 {
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 3s;
+    }
+
+    .text2 {
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 5s;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .btn {
+      margin-top: 30px;
+      padding: 14px 30px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 7s;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+    }
+
+    .btn:hover {
+      background-color: #ff3399;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 500px) {
+      img.lily {
+        width: 120px;
+      }
+      h1 {
+        font-size: 26px;
+      }
+      p {
+        font-size: 16px;
+      }
+      .btn {
+        padding: 12px 24px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Canvas Animasi Kupu-Kupu -->
+<canvas id="butterflyCanvas"></canvas>
+
+<div class="container">
+  <!-- Bunga Lily -->
+  <img src="lily.png" class="lily" alt="Bunga Lily">
+
+  <h1>Selamat Pagi Cii 🌸</h1>
+
+  <p class="text1">Udah percaya sama aku belom hari ini??</p>
+  <p class="text2">Kalo belom aku bakal terus usaha ✨<br> Tapi tetep bantuin yaa cii 🤍</p>
+
+  <!-- Tombol ke surat -->
+  <a href="surat.html" class="btn">Klik Kalau Udah Siap 💌</a>
+</div>
+
+<script>
+  const canvas = document.getElementById("butterflyCanvas");
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  let butterflies = [];
+
+  for (let i = 0; i < 20; i++) {
+    butterflies.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: 4 + Math.random() * 3,
+      dx: (Math.random() - 0.5) * 1.5,
+      dy: (Math.random() - 0.5) * 1.5,
+      color: "rgba(255,105,180,0.7)"
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    butterflies.forEach(bf => {
+      ctx.beginPath();
+      ctx.arc(bf.x, bf.y, bf.r, 0, Math.PI * 2, false);
+      ctx.fillStyle = bf.color;
+      ctx.fill();
+
+      bf.x += bf.dx;
+      bf.y += bf.dy;
+
+      if (bf.x + bf.r > canvas.width || bf.x - bf.r < 0) bf.dx *= -1;
+      if (bf.y + bf.r > canvas.height || bf.y - bf.r < 0) bf.dy *= -1;
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+
+</body>
+</html>
