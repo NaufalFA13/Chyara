@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Surat Untuk Chyara</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">❤️</div>
+  <div class="envelope" onclick="openEnvelope()">
+    <div class="envelope-flap"></div>
+    <div class="envelope-body"></div>
+  </div>
+
+  <div class="letter" id="letter">
+    <div class="letter-content">
+      🌸 Dear Chyara 🌸<br><br>
+      Aku senang hari ini kau tampak baik baik saja dan aku harap itu berlanjut hingga selanjutnya. Santai saja jika harimu buruk, aku akan selalu di samping mu siap mendengarkan mu bercerita. Aku harap kau tidak sungkan untuk bercerita tentang apapun itu, aku selalu menunggu pesan mu.<br><br>
+    </div>
+    <div class="photo-frame">
+      <img src="foto.jpg" alt="Foto Kenangan">
+    </div>
+  </div>
+</div>
+
+<audio id="bgMusic" src="lagu.mp3" autoplay loop></audio>
+
+<div class="music-control" onclick="toggleMusic()">
+  🎵
+</div>
+
+<script>
+  const audio = document.getElementById('bgMusic');
+  const control = document.querySelector('.music-control');
+
+  window.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play();
+    }
+  });
+
+  function toggleMusic() {
+    if (audio.paused) {
+      audio.play();
+      control.textContent = '🎵';
+    } else {
+      audio.pause();
+      control.textContent = '🔇';
+    }
+  }
+
+  function openEnvelope() {
+    document.querySelector('.envelope').classList.add('opened');
+    document.querySelector('.logo').style.display = 'none';
+    setTimeout(() => {
+      const letter = document.getElementById('letter');
+      letter.classList.add('show');
+    }, 1500);
+  }
+</script>
+
+</body>
+</html>
