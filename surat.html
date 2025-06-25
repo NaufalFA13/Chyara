@@ -74,8 +74,7 @@
       left: 50%;
       transform: translateX(-50%) translateY(220px);
       width: 90%;
-      max-width: 500px;
-      min-height: 300px;
+      max-width: 450px;
       background: url('https://i.ibb.co/Yyb3BBF/paper-texture.png') repeat;
       background-color: #fff9f2;
       border-radius: 10px;
@@ -103,8 +102,7 @@
     }
 
     .photo-frame {
-      width: 230px;
-      height: 150px;
+      width: 100%;
       background: #fff;
       border: 4px solid #f5a6be;
       border-radius: 16px;
@@ -115,8 +113,8 @@
 
     .photo-frame img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
+      display: block;
       border-radius: 12px;
     }
 
@@ -167,7 +165,6 @@
       transition: 1s ease 1s;
     }
 
-    /* RESPONSIVE UNTUK HP */
     @media (max-width: 480px) {
       .letter {
         padding: 20px 16px;
@@ -176,11 +173,6 @@
       .letter p {
         font-size: 15px;
         line-height: 1.75;
-      }
-
-      .photo-frame {
-        width: 200px;
-        height: 130px;
       }
 
       .emoji {
@@ -198,7 +190,7 @@
 </head>
 <body>
 
-<audio id="bgm" src="assets/music/lagu.mp3" autoplay loop></audio>
+<audio id="bgm" src="lagu.mp3" autoplay loop></audio>
 
 <div class="envelope-container" onclick="openEnvelope()">
   <div class="envelope"></div>
@@ -209,8 +201,9 @@
     <p>Aku senang hari ini kau tampak baik-baik saja dan aku harap itu berlanjut hingga selanjutnya. Santai saja jika harimu buruk, aku akan selalu di sampingmu, siap mendengarkanmu bercerita. Aku harap kau tidak sungkan untuk bercerita tentang apapun itu. Aku selalu menunggu pesanmu.</p>
     <div class="emoji">🌸</div>
     <div class="photo-frame">
-      <img src="assets/image/foto.jpg" alt="Foto Kita">
+      <img src="foto.jpg" alt="Foto Kita">
     </div>
+    <div class="next-button" onclick="nextAction()">Selanjutnya</div>
   </div>
 </div>
 
@@ -222,6 +215,9 @@
     heart.classList.add('open');
   }
 
+  function nextAction() {
+    alert("Kamu klik tombol Selanjutnya!");
+  }
 
   window.addEventListener('click', () => {
     const audio = document.getElementById('bgm');
