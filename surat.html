@@ -116,6 +116,8 @@
       height: auto;
       display: block;
       border-radius: 12px;
+      object-fit: cover;
+      max-height: 320px;
     }
 
     .next-button {
@@ -180,6 +182,10 @@
         margin: 16px 0;
       }
 
+      .photo-frame img {
+        max-height: 200px;
+      }
+
       .next-button {
         font-size: 14px;
         padding: 10px 24px;
@@ -190,7 +196,7 @@
 </head>
 <body>
 
-<audio id="bgm" src="lagu.mp3" autoplay loop></audio>
+<audio id="bgm" src="assets/music/lagu.mp3" autoplay loop></audio>
 
 <div class="envelope-container" onclick="openEnvelope()">
   <div class="envelope"></div>
@@ -201,7 +207,7 @@
     <p>Aku senang hari ini kau tampak baik-baik saja dan aku harap itu berlanjut hingga selanjutnya. Santai saja jika harimu buruk, aku akan selalu di sampingmu, siap mendengarkanmu bercerita. Aku harap kau tidak sungkan untuk bercerita tentang apapun itu. Aku selalu menunggu pesanmu.</p>
     <div class="emoji">🌸</div>
     <div class="photo-frame">
-      <img src="foto.jpg" alt="Foto Kita">
+      <img src="assets/image/foto.jpg" alt="Foto Kita">
     </div>
     <div class="next-button" onclick="nextAction()">Selanjutnya</div>
   </div>
