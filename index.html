@@ -102,11 +102,19 @@
   .petals-fall{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
   .petals-fall span{position:absolute;bottom:-10%;width:14px;height:14px;background:var(--accent2);border-radius:0 100% 0 100%;animation:rise linear forwards;}
   @keyframes rise{ to{ transform:translateY(-115vh) rotate(200deg); opacity:0; } }
+
+  .music-toggle{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;color:var(--accent);padding:0;transition:opacity .2s;}
+  .music-toggle svg{width:18px;height:18px;}
+  .music-toggle.off{opacity:.55;}
   @media (prefers-reduced-motion:reduce){ .env-flap,.fade,.mem-inner,.petal,.petal-btn{transition:none;animation:none;} .petals-fall span{display:none;} }
 </style>
 </head>
 <body>
 <div id="root"></div>
+<!-- Ganti "music.mp3" dengan nama file musikmu, taruh di folder yang sama dengan index.html -->
+<audio id="bgm" loop preload="auto" playsinline>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
 
 <script type="text/babel" data-presets="react">
 const { useState, useRef, useEffect } = React;
@@ -141,6 +149,26 @@ function PetalsFall(){
 }
 
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(p=>p[1]); }
+
+function MusicToggle({ playing, onToggle }){
+  return (
+    <button className={"music-toggle" + (playing ? "" : " off")} onClick={onToggle} aria-label={playing ? 'Matikan musik' : 'Nyalakan musik'}>
+      {playing ? (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+          <path d="M16 8.5a5 5 0 0 1 0 7"/>
+          <path d="M18.5 6a8.5 8.5 0 0 1 0 12"/>
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+          <line x1="16" y1="9" x2="21" y2="14"/>
+          <line x1="21" y1="9" x2="16" y2="14"/>
+        </svg>
+      )}
+    </button>
+  );
+}
 
 function MemoryGame({ onDone }){
   const [cards] = useState(() => shuffle(WORDS.concat(WORDS)).map((label,i) => ({ id:i, label, flipped:false, matched:false })));
@@ -280,9 +308,36 @@ function App(){
   const [noPos, setNoPos] = useState({x:0, y:0});
   const [noClicks, setNoClicks] = useState(0);
   const [gelar] = useState(() => GELAR[Math.floor(Math.random()*GELAR.length)]);
+  const [musicOn, setMusicOn] = useState(true);
   const rowRef = useRef(null);
+  const audioRef = useRef(null);
+  const fadeRef = useRef(null);
   const stepIndex = STEPS.indexOf(step);
   const allChecked = checked.every(Boolean);
+
+  useEffect(() => { audioRef.current = document.getElementById('bgm'); }, []);
+
+  function fadeIn(a){
+    clearInterval(fadeRef.current);
+    a.volume = 0;
+    fadeRef.current = setInterval(() => {
+      a.volume = Math.min(0.55, a.volume + 0.05);
+      if (a.volume >= 0.55) clearInterval(fadeRef.current);
+    }, 120);
+  }
+
+  // iOS Safari hanya mengizinkan audio.play() jika dipicu langsung dari gesture
+  // pengguna (tap/klik). Fungsi ini dipanggil di dalam onClick, bukan di useEffect.
+  function startMusic(){
+    const a = audioRef.current; if (!a) return;
+    if (a.paused){
+      a.play().then(() => { fadeIn(a); setMusicOn(true); }).catch(() => { setMusicOn(false); });
+    }
+  }
+  function toggleMusic(){
+    const a = audioRef.current; if (!a) return;
+    if (a.paused){ startMusic(); } else { a.pause(); setMusicOn(false); }
+  }
 
   function toggleCheck(i){ setChecked(c => c.map((v, idx) => idx === i ? !v : v)); }
   function dodgeNo(){
@@ -295,6 +350,7 @@ function App(){
 
   return (
     <div className="stage">
+      <MusicToggle playing={musicOn} onToggle={toggleMusic} />
       <div className="dots">{STEPS.map((s,i) => <span key={s} className={i<=stepIndex ? 'active' : ''}></span>)}</div>
 
       {step==='intro' && (
@@ -302,7 +358,7 @@ function App(){
           <div className="lily-lg"><Lily size={40} /></div>
           <div className="intro-title">Sebelum mulai</div>
           <div className="intro-sub">Ada surat, dua permainan kecil, satu rangkaian kelopak, dan janji yang ingin kutepati. Siap membukanya?</div>
-          <button className="plain yes" onClick={() => setStep('envelope')}>Aku siap</button>
+          <button className="plain yes" onClick={() => { startMusic(); setStep('envelope'); }}>Aku siap</button>
         </div>
       )}
 
