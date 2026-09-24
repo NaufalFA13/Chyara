@@ -1,1 +1,402 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12201A">
+<title>Chyara</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+  :root{
+    --bg:#12201A; --bg2:#1B2C22; --accent:#C7B989; --accent2:#EDE7D8; --ink:#F1ECE0; --ink-dim:#93A794;
+    --paper:#FBF8F1; --paper-ink:#233024; --line:#33473A;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  html,body{min-height:100%;overflow-x:hidden;}
+  body{ margin:0;color:var(--ink);font-family:'Jost',sans-serif; background:radial-gradient(ellipse at top, var(--bg2), var(--bg) 75%); display:flex;align-items:center;justify-content:center; min-height:100vh;min-height:100dvh; padding:24px 0; width:100%; }
+  #root{width:100%;}
+  .stage{width:100%;max-width:440px;padding:26px 22px;text-align:center;position:relative;margin:0 auto;}
+  @media (max-width:360px){
+    .stage{padding:22px 14px;}
+    .intro-title{font-size:23px;}
+    .letter h1{font-size:21px;}
+    .letter p{font-size:16.5px;}
+  }
+  .fade{transition:opacity .5s ease, transform .5s ease;}
+  .dots{display:flex;justify-content:center;gap:5px;margin-bottom:22px;flex-wrap:wrap;}
+  .dots span{width:5px;height:5px;border-radius:50%;background:var(--ink-dim);opacity:.35;transition:all .3s;}
+  .dots span.active{opacity:1;background:var(--accent);width:14px;border-radius:3px;}
+  .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);margin-bottom:12px;text-transform:uppercase;}
+  .lily{color:var(--accent);}
+  .lily-lg{margin-bottom:10px;}
+  .intro-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:27px;margin:0 0 12px;}
+  .intro-sub{font-size:14px;color:var(--ink-dim);margin-bottom:24px;line-height:1.7;max-width:32ch;margin-left:auto;margin-right:auto;}
+  .divider{width:36px;height:1px;background:var(--line);margin:18px auto;}
+  .envelope{width:210px;max-width:82vw;height:144px;margin:16px auto 22px;position:relative;cursor:pointer;}
+  .env-body{position:absolute;inset:0;background:var(--paper);border-radius:2px;box-shadow:0 20px 44px rgba(0,0,0,.4);}
+  .env-flap{position:absolute;top:0;left:0;width:0;height:0;border-left:105px solid transparent;border-right:105px solid transparent;border-top:74px solid #EFE7D6;transform-origin:top center;transition:transform .5s ease;}
+  .envelope:hover .env-flap{transform:rotateX(-25deg);}
+  .env-seal{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);}
+  .hint{font-size:13px;color:var(--ink-dim);margin-top:6px;}
+  .letter{background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:32px 26px 26px;box-shadow:0 24px 60px rgba(0,0,0,.4);font-family:'Cormorant Garamond',serif;text-align:left;max-height:52vh;overflow-y:auto;}
+  .letter h1{font-size:24px;margin:0 0 12px;font-style:italic;font-weight:600;}
+  .letter p{font-size:18px;line-height:1.55;margin:0 0 12px;}
+  .sign{font-size:18px;font-style:italic;text-align:right;margin-top:14px;}
+  .stepnote{font-size:14px;color:var(--ink-dim);margin-bottom:18px;line-height:1.5;}
+  .cta{margin-top:22px;}
+  button.plain{font-family:'Jost',sans-serif;font-weight:500;font-size:14px;padding:11px 22px;border-radius:2px;border:1px solid var(--accent);background:transparent;color:var(--ink);cursor:pointer;transition:transform .15s, background .15s, opacity .3s, color .15s;letter-spacing:.02em;}
+  button.plain:disabled{opacity:.3;cursor:not-allowed;}
+  .yes{background:var(--accent);color:var(--paper-ink);border-color:var(--accent);}
+  .yes:hover{transform:translateY(-1px);}
+
+  /* Memory game */
+  .mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;perspective:800px;}
+  .mem-card{aspect-ratio:1;cursor:pointer;position:relative;}
+  .mem-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .45s ease;}
+  .mem-card.flip .mem-inner{transform:rotateY(180deg);}
+  .mem-face{position:absolute;inset:0;border-radius:8px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;}
+  .mem-front{background:var(--paper);border:1px solid var(--accent);}
+  .mem-back{background:var(--accent);color:var(--paper-ink);transform:rotateY(180deg);font-family:'Cormorant Garamond',serif;font-size:12.5px;font-weight:600;padding:4px;text-align:center;}
+  .mem-card.matched .mem-back{background:var(--accent2);}
+  .status{font-size:13px;color:var(--ink-dim);margin:14px 0 4px;}
+
+  /* Catch game */
+  .field{position:relative;height:240px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:10px;}
+  .petal{position:absolute;top:-24px;width:18px;height:18px;background:var(--accent2);border-radius:0 100% 0 100%;transform:rotate(45deg);border:none;cursor:pointer;padding:0;animation:fall linear forwards;}
+  @keyframes fall{ to{ top:104%; } }
+  .score{font-size:13px;color:var(--ink-dim);margin-bottom:6px;}
+  .score b{color:var(--accent);}
+
+  /* Simon / rangkai */
+  .simon-wrap{width:220px;max-width:80vw;height:220px;margin:8px auto 18px;position:relative;}
+  .simon-center{position:absolute;top:50%;left:50%;width:26px;height:26px;transform:translate(-50%,-50%);border-radius:50%;background:var(--accent);}
+  .petal-btn{position:absolute;top:50%;left:50%;width:52px;height:52px;margin:-26px;border-radius:0 100% 0 100%;border:1px solid var(--accent);background:var(--paper);cursor:pointer;transition:background .2s, transform .2s;}
+  .petal-btn.lit{background:var(--accent);transform:scale(1.08);}
+  .petal-btn.done{opacity:.4;}
+  .simon-msg{font-size:13px;color:var(--ink-dim);margin-bottom:8px;min-height:18px;}
+
+  /* Promises */
+  .promises{display:flex;flex-direction:column;gap:9px;text-align:left;margin-bottom:6px;}
+  .promise{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:2px;padding:12px 14px;cursor:pointer;transition:border-color .2s, background .2s;}
+  .promise.checked{border-color:var(--accent);background:rgba(199,185,137,.1);}
+  .check{width:18px;height:18px;border:1px solid var(--accent);flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--accent);}
+  .promise span.txt{font-size:14px;color:var(--ink);}
+
+  /* Ask */
+  .btnrow{position:relative;height:56px;display:flex;align-items:center;justify-content:center;gap:14px;}
+  .taunt{font-size:13px;color:var(--ink-dim);margin-top:12px;min-height:18px;font-style:italic;}
+
+  /* Bonus */
+  .cert{background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:30px 24px;box-shadow:0 24px 60px rgba(0,0,0,.4);border:1px solid var(--accent);}
+  .cert .kop{font-size:10.5px;letter-spacing:.14em;color:var(--accent);margin-bottom:10px;text-transform:uppercase;}
+  .cert h2{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:23px;margin:8px 0;}
+  .cert .gelar{font-size:14.5px;font-weight:500;margin-bottom:10px;}
+  .cert .fineprint{font-size:11.5px;color:#5b6b5c;}
+
+  .petals-fall{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
+  .petals-fall span{position:absolute;bottom:-10%;width:14px;height:14px;background:var(--accent2);border-radius:0 100% 0 100%;animation:rise linear forwards;}
+  @keyframes rise{ to{ transform:translateY(-115vh) rotate(200deg); opacity:0; } }
+  @media (prefers-reduced-motion:reduce){ .env-flap,.fade,.mem-inner,.petal,.petal-btn{transition:none;animation:none;} .petals-fall span{display:none;} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useRef, useEffect } = React;
+
+const STEPS = ['intro','envelope','letter','memory','catch','simon','promises','ask','end','bonus','outro'];
+const WORDS = ['Maaf','Rindu','Sabar','Percaya','Sayang','Kita'];
+const TAUNTS = ['Boleh dipikir lagi sebentar?','Aku tunggu, nggak buru-buru kok','Setidaknya lily-nya keliatan kan?','Baik, aku sabar','Sekali lagi, ya?'];
+const GELAR = ['Yang Paling Ditunggu Kabarnya','Pemilik Sabar Tingkat Tinggi','Juara Baikan Paling Elegan','Yang Selalu Dimaafkan, Selalu Disayang'];
+const PROMISES = [
+  'Lebih sabar dengerin cerita kamu',
+  'Nggak baperan kalau ditegur',
+  'Bilang kalau ada yang ganjel, bukan diam saja',
+  'Kasih kejutan kecil sesekali',
+  'Ada, tanpa perlu diminta dua kali',
+];
+
+function Lily({size=32}){
+  return (
+    <svg className="lily" width={size} height={size} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M32 56 L32 26" />
+      <path d="M32 40 C24 40 19 46 16 50" />
+      <path d="M32 40 C40 40 45 46 48 50" />
+      <path d="M32 26 C22 26 17 17 19 10 C28 12 32 19 32 26 C32 19 36 12 45 10 C47 17 42 26 32 26 Z" />
+      <path d="M32 15 C29 12 26 8 27 4 C31 5 33 9 32 15 Z" />
+    </svg>
+  );
+}
+
+function PetalsFall(){
+  const spans = Array.from({length:18}, (_,i) => ({ id:i, left:Math.random()*100, dur:3+Math.random()*2.4, delay:Math.random()*0.8, rot:Math.random()*90 }));
+  return <div className="petals-fall">{spans.map(s => <span key={s.id} style={{left:s.left+'vw', animationDuration:s.dur+'s', animationDelay:s.delay+'s', transform:`rotate(${s.rot}deg)`}}></span>)}</div>;
+}
+
+function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(p=>p[1]); }
+
+function MemoryGame({ onDone }){
+  const [cards] = useState(() => shuffle(WORDS.concat(WORDS)).map((label,i) => ({ id:i, label, flipped:false, matched:false })));
+  const [state, setState] = useState(cards);
+  const [pending, setPending] = useState([]);
+  const [lock, setLock] = useState(false);
+
+  function pick(i){
+    if (lock || state[i].flipped || state[i].matched) return;
+    const next = state.map((c,idx) => idx===i ? {...c, flipped:true} : c);
+    setState(next);
+    const nowPending = [...pending, i];
+    setPending(nowPending);
+    if (nowPending.length === 2){
+      setLock(true);
+      const [a,b] = nowPending;
+      setTimeout(() => {
+        setState(s => {
+          const match = s[a].label === s[b].label;
+          return s.map((c,idx) => (idx===a||idx===b) ? {...c, flipped:match, matched: match ? true : c.matched} : c);
+        });
+        setPending([]); setLock(false);
+      }, 600);
+    }
+  }
+
+  const done = state.every(c => c.matched);
+
+  return (
+    <div className="fade">
+      <div className="stepnote">Buka dua kartu, cocokkan pasangannya.</div>
+      <div className="mem-grid">
+        {state.map((c,i) => (
+          <div key={c.id} className={"mem-card" + (c.flipped||c.matched ? " flip" : "") + (c.matched ? " matched" : "")} onClick={() => pick(i)}>
+            <div className="mem-inner">
+              <div className="mem-face mem-front"><Lily size={16} /></div>
+              <div className="mem-face mem-back">{c.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="cta"><button className="plain yes" disabled={!done} onClick={onDone}>{done ? 'Lanjut' : 'Cocokkan semua dulu'}</button></div>
+    </div>
+  );
+}
+
+function CatchGame({ onDone }){
+  const [items, setItems] = useState([]);
+  const [score, setScore] = useState(0);
+  const idRef = useRef(0);
+  const target = 6;
+
+  useEffect(() => {
+    if (score >= target) return;
+    const spawn = setInterval(() => {
+      idRef.current += 1;
+      const id = idRef.current;
+      const left = 8 + Math.random()*82;
+      const dur = 2.3 + Math.random()*1.1;
+      setItems(list => [...list.slice(-6), { id, left, dur }]);
+      setTimeout(() => setItems(list => list.filter(it => it.id !== id)), dur*1000 + 50);
+    }, 680);
+    return () => clearInterval(spawn);
+  }, [score]);
+
+  function catchPetal(id){ setItems(list => list.filter(it => it.id !== id)); setScore(s => Math.min(target, s+1)); }
+
+  return (
+    <div className="fade">
+      <div className="stepnote">Tangkap kelopaknya sebelum jatuh ke tanah.</div>
+      <div className="field">
+        {items.map(it => <button key={it.id} className="petal" style={{left:it.left+'%', animationDuration:it.dur+'s'}} onClick={() => catchPetal(it.id)}></button>)}
+      </div>
+      <div className="score">Tertangkap: <b>{score}/{target}</b></div>
+      <div className="cta"><button className="plain yes" disabled={score < target} onClick={onDone}>{score >= target ? 'Lanjut' : `Tangkap ${target-score} lagi`}</button></div>
+    </div>
+  );
+}
+
+function SimonGame({ onDone }){
+  const N = 5, LEN = 4;
+  const positions = Array.from({length:N}, (_,i) => {
+    const angle = (i * (360/N) - 90) * Math.PI/180;
+    return { x: Math.cos(angle)*78, y: Math.sin(angle)*78 };
+  });
+  const [seq] = useState(() => Array.from({length:LEN}, () => Math.floor(Math.random()*N)));
+  const [lit, setLit] = useState(-1);
+  const [playing, setPlaying] = useState(true);
+  const [userSeq, setUserSeq] = useState([]);
+  const [msg, setMsg] = useState('Perhatikan urutannya...');
+  const [wrong, setWrong] = useState(false);
+  const [won, setWon] = useState(false);
+
+  useEffect(() => {
+    let t = 0; const timers = [];
+    seq.forEach((idx, i) => {
+      timers.push(setTimeout(() => setLit(idx), t));
+      timers.push(setTimeout(() => setLit(-1), t + 420));
+      t += 650;
+    });
+    timers.push(setTimeout(() => { setPlaying(false); setMsg('Sekarang giliranmu, tap sesuai urutan.'); }, t));
+    return () => timers.forEach(clearTimeout);
+  }, [seq]);
+
+  function tap(i){
+    if (playing || won) return;
+    const next = [...userSeq, i];
+    const idx = next.length - 1;
+    if (seq[idx] !== i){
+      setWrong(true); setMsg('Kurang tepat, coba lagi.');
+      setTimeout(() => { setWrong(false); setUserSeq([]); }, 500);
+      return;
+    }
+    setUserSeq(next);
+    if (next.length === seq.length){ setWon(true); setMsg('Rangkaiannya sempurna.'); }
+  }
+
+  return (
+    <div className="fade">
+      <div className="stepnote">Rangkai kelopaknya sesuai urutan yang ditampilkan.</div>
+      <div className="simon-msg">{msg}</div>
+      <div className="simon-wrap">
+        <div className="simon-center"></div>
+        {positions.map((p,i) => (
+          <button key={i} className={"petal-btn" + (lit===i ? " lit" : "") + (userSeq.includes(i) && !wrong ? " done" : "")}
+            style={{transform:`translate(${p.x}px, ${p.y}px) rotate(${i*72}deg)`}} onClick={() => tap(i)}></button>
+        ))}
+      </div>
+      <div className="cta"><button className="plain yes" disabled={!won} onClick={onDone}>{won ? 'Lanjut' : 'Selesaikan rangkaian dulu'}</button></div>
+    </div>
+  );
+}
+
+function App(){
+  const [step, setStep] = useState('intro');
+  const [checked, setChecked] = useState(Array(PROMISES.length).fill(false));
+  const [noPos, setNoPos] = useState({x:0, y:0});
+  const [noClicks, setNoClicks] = useState(0);
+  const [gelar] = useState(() => GELAR[Math.floor(Math.random()*GELAR.length)]);
+  const rowRef = useRef(null);
+  const stepIndex = STEPS.indexOf(step);
+  const allChecked = checked.every(Boolean);
+
+  function toggleCheck(i){ setChecked(c => c.map((v, idx) => idx === i ? !v : v)); }
+  function dodgeNo(){
+    const el = rowRef.current; if(!el) return;
+    const maxX = Math.max(0, el.offsetWidth - 170);
+    setNoPos({ x: Math.random()*maxX - maxX/2, y: (Math.random()-0.5)*14 });
+    setNoClicks(n => n+1);
+  }
+  function restart(){ setStep('intro'); setChecked(Array(PROMISES.length).fill(false)); setNoClicks(0); setNoPos({x:0,y:0}); }
+
+  return (
+    <div className="stage">
+      <div className="dots">{STEPS.map((s,i) => <span key={s} className={i<=stepIndex ? 'active' : ''}></span>)}</div>
+
+      {step==='intro' && (
+        <div className="fade">
+          <div className="lily-lg"><Lily size={40} /></div>
+          <div className="intro-title">Sebelum mulai</div>
+          <div className="intro-sub">Ada surat, dua permainan kecil, satu rangkaian kelopak, dan janji yang ingin kutepati. Siap membukanya?</div>
+          <button className="plain yes" onClick={() => setStep('envelope')}>Aku siap</button>
+        </div>
+      )}
+
+      {step==='envelope' && (
+        <div className="fade">
+          <div className="eyebrow">Ada Surat Untukmu</div>
+          <div className="envelope" onClick={() => setStep('letter')}>
+            <div className="env-body"></div><div className="env-flap"></div>
+            <div className="env-seal"><Lily size={22} /></div>
+          </div>
+          <div className="hint">Sentuh amplopnya untuk membuka</div>
+        </div>
+      )}
+
+      {step==='letter' && (
+        <div className="fade">
+          <div className="letter">
+            <h1>Sayang,</h1>
+            <p>Aku tahu belakangan ini ada yang salah, dan aku ikut bertanggung jawab atas itu. Maaf kalau ucapan atau sikapku bikin kamu kecewa dan jauh.</p>
+            <p>Bukan hal besar yang bikin kita renggang, tapi hal kecil yang dibiarkan menumpuk. Aku sadar itu, pelan-pelan.</p>
+            <p>Aku kangen versi kita yang saling mendengarkan. Kalau kamu berkenan, aku ingin mencoba lagi — lebih sabar, lebih hadir.</p>
+            <div className="sign">— dengan sungguh-sungguh</div>
+          </div>
+          <div className="cta"><button className="plain yes" onClick={() => setStep('memory')}>Lanjut</button></div>
+        </div>
+      )}
+
+      {step==='memory' && <MemoryGame onDone={() => setStep('catch')} />}
+      {step==='catch' && <CatchGame onDone={() => setStep('simon')} />}
+      {step==='simon' && <SimonGame onDone={() => setStep('promises')} />}
+
+      {step==='promises' && (
+        <div className="fade">
+          <div className="stepnote">Ini janji kecilku. Centang semua kalau kamu percaya aku akan mencoba.</div>
+          <div className="promises">
+            {PROMISES.map((p,i) => (
+              <div key={i} className={"promise" + (checked[i] ? " checked" : "")} onClick={() => toggleCheck(i)}>
+                <span className="check">{checked[i] ? '✓' : ''}</span>
+                <span className="txt">{p}</span>
+              </div>
+            ))}
+          </div>
+          <div className="cta"><button className="plain yes" disabled={!allChecked} onClick={() => setStep('ask')}>{allChecked ? 'Lanjut' : 'Centang semua dulu'}</button></div>
+        </div>
+      )}
+
+      {step==='ask' && (
+        <div className="fade">
+          <div className="stepnote" style={{marginBottom:'16px'}}>Boleh kita coba lagi dari awal?</div>
+          <div className="btnrow" ref={rowRef}>
+            <button className="plain yes" onClick={() => setStep('end')}>Ya, boleh</button>
+            <button className="plain" style={{transform:`translate(${noPos.x}px, ${noPos.y}px)`}} onMouseEnter={dodgeNo} onTouchStart={(e) => { e.preventDefault(); dodgeNo(); }}>Belum siap</button>
+          </div>
+          {noClicks > 0 && <div className="taunt">{TAUNTS[(noClicks-1) % TAUNTS.length]}</div>}
+        </div>
+      )}
+
+      {step==='end' && (
+        <div className="fade">
+          <PetalsFall />
+          <div className="lily-lg"><Lily size={38} /></div>
+          <div className="intro-title">Terima kasih sudah percaya lagi.</div>
+          <div className="intro-sub">Aku tidak akan menyia-nyiakannya.</div>
+          <button className="plain yes" onClick={() => setStep('bonus')}>Ada satu lagi untukmu</button>
+        </div>
+      )}
+
+      {step==='bonus' && (
+        <div className="fade">
+          <div className="cert">
+            <div className="lily-lg"><Lily size={30} /></div>
+            <div className="kop">Sertifikat Kecil · Kita Baikan</div>
+            <h2>Selamat, Kita Balikan</h2>
+            <div className="gelar">Gelar hari ini: "{gelar}"</div>
+            <div className="fineprint">Berlaku selama-lamanya, selama kita masih mau saling dengar.</div>
+          </div>
+          <div className="cta"><button className="plain yes" onClick={() => setStep('outro')}>Lanjut</button></div>
+        </div>
+      )}
+
+      {step==='outro' && (
+        <div className="fade">
+          <div className="lily-lg"><Lily size={36} /></div>
+          <div className="intro-title">Lembaran baru, ya?</div>
+          <div className="intro-sub">Terima kasih sudah membaca sampai sini. Aku tunggu kabarmu.</div>
+          <button className="plain" onClick={restart}>Ulangi dari awal</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
